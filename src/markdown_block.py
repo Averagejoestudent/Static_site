@@ -1,4 +1,7 @@
 from enum import Enum
+from textnode import text_node_to_html_node
+from newcode import text_to_textnodes
+from htmlnode import ParentNode
 import re
 
 class BlockType(Enum):
@@ -45,11 +48,30 @@ def block_to_block_type(block):
         return BlockType.OLIST
     return BlockType.PARAGRAPH
 
+def text_to_children(text):
+    text_nodes = text_to_textnodes(text)
+    children_html_nodes = []
+    for text_node in text_nodes:
+        children_html_nodes.append(text_node_to_html_node(text_node))
+    return children_html_nodes
+
+
+
+
 def Heading_Block(block):
-    pass
+    count = 0
+    for char in block:
+        if char == "#":
+            count += 1
+        else:
+            break
+    heading = block[count:].strip()
+    children = text_to_children(heading)
+    return ParentNode(f"h{count}", children)
 
 def Paragraph_Block(block):
-    pass
+    children = text_to_children(block)
+    return ParentNode("p",children)
 
 def Code_Block(block):
     pass
@@ -65,17 +87,20 @@ def Quote_Block(block):
 
 def markdown_to_html_node(markdown):
      list_of_blocks = markdown_to_blocks(markdown)
+     html_node_list = []
      for block in list_of_blocks:
         type_of_block = block_to_block_type(block)
         if type_of_block == BlockType.HEADING:
-            Heading_Block(block)
+            html_node = Heading_Block(block)
         elif type_of_block == BlockType.CODE:
-            Code_Block(block)
+            html_node = Code_Block(block)
         elif type_of_block == BlockType.PARAGRAPH:
-            Paragraph_Block(block)
+            html_node = Paragraph_Block(block)
         elif type_of_block == BlockType.QUOTE:
-            Quote_Block(block)
+            html_node = Quote_Block(block)
         elif type_of_block == BlockType.OLIST:
-            Olist_Block(block)
+            html_node = Olist_Block(block)
         elif type_of_block == BlockType.ULIST:
-            Ulist_Block(block)
+            html_node = Ulist_Block(block)
+        if html_node:
+            html_node_list.append(html_node)
