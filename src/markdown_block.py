@@ -1,7 +1,7 @@
 from enum import Enum
 from textnode import text_node_to_html_node
 from newcode import text_to_textnodes
-from htmlnode import ParentNode
+from htmlnode import ParentNode , LeafNode
 import re
 
 class BlockType(Enum):
@@ -70,25 +70,54 @@ def Heading_Block(block):
     return ParentNode(f"h{count}", children)
 
 def Paragraph_Block(block):
+    block = block.replace("\n", " ")
     children = text_to_children(block)
     return ParentNode("p",children)
 
 def Code_Block(block):
-    pass
+    code_content = block[3:-3]
+    if code_content.startswith('\n'):
+        code_content = code_content[1:]
+    raw_code_leaf = LeafNode(None, code_content)
+    code_html = ParentNode("code", [raw_code_leaf])
+    return ParentNode("pre", [code_html])
 
 def Olist_Block(block):
-    pass
+    lines = block.split('\n')
+    list_items = []
+    for i, line in enumerate(lines):
+        dot_index = line.find('.')
+        space_index = line.find(' ', dot_index + 1)
+        item_text = line[space_index + 1:]
+        children = text_to_children(item_text)
+        list_items.append(ParentNode("li", children))
+    return ParentNode("ol", list_items)
+
 
 def Ulist_Block(block):
-    pass
+    lines = block.split('\n')
+    list_items = []
+    for line in lines:
+        item_text = line[2:]
+        children = text_to_children(item_text)
+        list_items.append(ParentNode("li", children))
+    return ParentNode("ul", list_items)
+
 
 def Quote_Block(block):
-    pass
+    lines = block.split('\n')
+    processed_lines = [line[1:].strip() for line in lines] # Remove '>' and strip
+    processed_text = "\n".join(processed_lines)
+    children = text_to_children(processed_text)
+    return ParentNode("blockquote", children)
 
 def markdown_to_html_node(markdown):
-     list_of_blocks = markdown_to_blocks(markdown)
-     html_node_list = []
-     for block in list_of_blocks:
+    list_of_blocks = markdown_to_blocks(markdown)
+    if not list_of_blocks:
+       return LeafNode("div","")
+
+    html_node_list = []
+    for block in list_of_blocks:
         type_of_block = block_to_block_type(block)
         if type_of_block == BlockType.HEADING:
             html_node = Heading_Block(block)
@@ -102,5 +131,9 @@ def markdown_to_html_node(markdown):
             html_node = Olist_Block(block)
         elif type_of_block == BlockType.ULIST:
             html_node = Ulist_Block(block)
+        else:
+            raise ValueError(f"Unknown block type")
         if html_node:
             html_node_list.append(html_node)
+    parent_div = ParentNode("div", html_node_list)
+    return parent_div
