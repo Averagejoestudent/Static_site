@@ -13,7 +13,7 @@ def main():
     print("Starting STATIC STIE GENERATOR")
     
     source_directory="static"
-    destination_directory = "public"
+    destination_directory = "docs"
     content_path = "content"
     template_path = "template.html"
 
