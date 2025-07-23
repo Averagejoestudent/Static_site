@@ -1,6 +1,6 @@
 import os
 import shutil
-import sys
+
 
 from newcode import extract_title
 from markdown_block import markdown_to_html_node

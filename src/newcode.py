@@ -84,8 +84,8 @@ def split_nodes_link(old_nodes):
 def text_to_textnodes(text):
     list_of_list = []
     node = TextNode(text,TextType.TEXT)
-    list_of_list.extend(split_nodes_link
-                        (split_nodes_image
+    list_of_list.extend(split_nodes_image
+                        (split_nodes_link
                         (split_nodes_delimiter
                         (split_nodes_delimiter(
                             split_nodes_delimiter([node],'**',TextType.BOLD),"_",TextType.ITALIC),'`',TextType.CODE))))

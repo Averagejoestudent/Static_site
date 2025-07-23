@@ -11,10 +11,18 @@ class HTMLNode:
     def props_to_html(self):
         if self.props is None:
             return ""
-        props_html = ""
-        for prop in self.props:
-            props_html += f' {prop}="{self.props[prop]}"'
-        return props_html
+        if not isinstance(self.props, dict):
+            print("Invalid props passed:", self.props)  # Debug line
+            raise TypeError(f"Expected dict, got {type(self.props)}")
+        # props_html = ""
+        # for prop in self.props:
+        #     props_html += f' {prop}="{self.props[prop]}"'
+        # return props_html
+        html_attributes = []
+        for key, value in self.props.items():
+            html_attributes.append(f' {key}="{value}"')
+
+        return "".join(html_attributes)
 
     def __repr__(self):
         return f"HTMLNode({self.tag}, {self.value}, children: {self.children}, {self.props})"

@@ -34,7 +34,7 @@ class TestHTMLNode(unittest.TestCase):
         )
         self.assertEqual(
             node.props,
-            None,
+            {},
         )
 
     def test_repr(self):
